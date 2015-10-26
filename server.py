@@ -5,7 +5,7 @@ Clase (y programa principal) para un servidor de eco en UDP simple
 """
 
 import socketserver
-
+import sys
 
 class EchoHandler(socketserver.DatagramRequestHandler):
     """
@@ -13,6 +13,12 @@ class EchoHandler(socketserver.DatagramRequestHandler):
     """
 
     def handle(self):
+        #print(self.client_address)
+        IP = self.client_address[0]
+        print('IP' + ':' + IP)
+        PORT = self.client_address[1]
+        print('PORT' + ':' + str(PORT))
+        
         # Escribe dirección y puerto del cliente (de tupla client_address)
         self.wfile.write(b"Hemos recibido tu peticion")
         while 1:
@@ -25,7 +31,7 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                 break
 
 if __name__ == "__main__":
-    # Creamos servidor de eco y escuchamos
-    serv = socketserver.UDPServer(('', 6001), EchoHandler)
+    # Creamos servidor de eco y escuchamos 
+    serv = socketserver.UDPServer(('',int(sys.argv[1])), EchoHandler)
     print("Lanzando servidor UDP de eco...")
     serv.serve_forever()
