@@ -37,6 +37,8 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                 else: 
                     direccion = elemento[1].split(':')[1]
                     self.dicc[direccion] = IP
+                    if elemento[-2] == 0:
+                        dicc.pop(direccion)
             self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
             # Si no hay más líneas salimos del bucle infinito
             if not line:
