@@ -10,7 +10,6 @@ import sys
     
 # Cliente UDP simple.
 
-# Dirección IP del servidor.
 try:
     SERVER = sys.argv[1]
     PORT = int(sys.argv[2])
