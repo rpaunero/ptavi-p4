@@ -49,10 +49,13 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                     direccion = elemento[1].split(':')[1]
                     time_expires = time.gmtime(int(elemento[-2]))
                     time_expires = time.strftime('%Y-%m-%d %H:%M:%S', time_expires)
+                    current_time = time.gmtime(time.time())
+                    current_time = time.strftime('%Y-%m-%d %H:%M:%S', current_time)
                     self.dicc[direccion] = [IP, time_expires]
                     print('IP traza:' + IP)
                     print('Expires traza:' + time_expires)
-                    if time_expires == '0':
+                    if (time_expires < current_time):
+                    #if time_expires == '0':
                         del self.dicc[direccion]
                         print('eliminamos:' + direccion)
             self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
