@@ -18,11 +18,7 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     dicc = {}
 
     def register2json(self):
-       # datosJson = json.dumps(self.misDatos)
         with open('registered.json', 'w') as ff:
-         #   hora = time.gmtime(self.dicc[direccion][1]) #toma los segundos desde el 1 de enero de 1970 (devuelve tupla)
-         #  hora = time.strftime('%Y-%m-%d %H:%M:%S', hora) + '\r\n' #representa el tiempo en un string
-         #   datos = (direccion + '\r\n' + self.dicc[direccion][0] + hora)
             json.dump(self.dicc, ff)
 
     def handle(self):
@@ -38,8 +34,9 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             # Leyendo línea a línea lo que nos envía el cliente
             line = self.rfile.read()
             
-            print("El cliente nos manda " + line.decode('utf-8'))
             line = line.decode('utf-8')
+            print("El cliente nos manda " + line)
+           
                      
             elemento = line.split(' ')            
             if elemento[0] == 'REGISTER':
@@ -47,15 +44,15 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                    break
                 else:
                     direccion = elemento[1].split(':')[1]
-                    time_expires = time.gmtime(int(elemento[-2]))
+                    time_expires = time.gmtime(time.time() + int(elemento[-2]))
                     time_expires = time.strftime('%Y-%m-%d %H:%M:%S', time_expires)
                     current_time = time.gmtime(time.time())
                     current_time = time.strftime('%Y-%m-%d %H:%M:%S', current_time)
                     self.dicc[direccion] = [IP, time_expires]
                     print('IP traza:' + IP)
                     print('Expires traza:' + time_expires)
-                    if (time_expires < current_time):
-                    #if time_expires == '0':
+                    print(time_expires + ('....') + current_time)
+                    if (time_expires <= current_time):
                         del self.dicc[direccion]
                         print('eliminamos:' + direccion)
             self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
