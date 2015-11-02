@@ -17,9 +17,21 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     
     dicc = {}
 
+            
     def register2json(self):
-        with open('registered.json', 'w') as ff:
-            json.dump(self.dicc, ff)
+        try:
+            with open('registered.json', 'w') as ff:
+                json.dump(self.dicc, ff)
+        except:
+            pass
+
+    def json2register(self):
+        try:
+            with open('registered.json', 'r') as ff:
+                self.dicc = json.load(ff)
+        except:
+            pass
+
 
     def handle(self):
         #print(self.client_address)
@@ -29,10 +41,13 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
         print('PORT' + ':' + str(PORT))
         
         # Escribe dirección y puerto del cliente (de tupla client_address)
+        self.json2register()
         
         while 1:
             # Leyendo línea a línea lo que nos envía el cliente
             line = self.rfile.read()
+            if not line:
+                break
             
             line = line.decode('utf-8')
             print("El cliente nos manda " + line)
@@ -42,24 +57,34 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             if elemento[0] == 'REGISTER':
                 if not '@' in elemento[1].split(':')[1]:
                    break
-                else:
-                    direccion = elemento[1].split(':')[1]
-                    time_expires = time.gmtime(time.time() + int(elemento[-2]))
-                    time_expires = time.strftime('%Y-%m-%d %H:%M:%S', time_expires)
-                    current_time = time.gmtime(time.time())
-                    current_time = time.strftime('%Y-%m-%d %H:%M:%S', current_time)
-                    self.dicc[direccion] = [IP, time_expires]
-                    print('IP traza:' + IP)
-                    print('Expires traza:' + time_expires)
-                    print(time_expires + ('....') + current_time)
-                    if (time_expires <= current_time):
-                        del self.dicc[direccion]
-                        print('eliminamos:' + direccion)
-            self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
-            self.register2json()
+
+                formato = '%Y-%m-%d %H:%M:%S'
+                direccion = elemento[1].split(':')[1]
+                time_expires1 = time.gmtime(time.time() + int(elemento[-2]))
+                time_expires = time.strftime(formato, time_expires1)
+                current_time1 = time.gmtime(time.time())
+                current_time = time.strftime(formato, current_time1)
+                self.dicc[direccion] = [IP, time_expires]
+                print('IP traza:' + IP)
+                print('Expires traza:' + time_expires)
+                print(time_expires + ('....') + current_time)
+
+
+                temp_list = []
+                for usuario in self.dicc:
+                   
+                   if (time.strptime(self.dicc[usuario][1], formato) <= current_time1):
+                       temp_list.append(usuario) 
+                       print('Añado a : ' + usuario + 'lista temporal')
+                            #del self.dicc[direccion]
+                            #print('eliminamos:' + direccion)
+                for usuario in temp_list:
+                    del self.dicc[usuario]
+                    print('eliminamos:' + usuario)
+                self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
+                self.register2json()
+
             # Si no hay más líneas salimos del bucle infinito
-            if not line:
-                break
 
 if __name__ == "__main__":
     # Creamos servidor de eco y escuchamos 
