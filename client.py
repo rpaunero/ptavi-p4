@@ -7,7 +7,7 @@ Programa cliente que abre un socket a un servidor
 import socket
 import sys
 
-    
+
 # Cliente UDP simple.
 
 try:
@@ -15,7 +15,8 @@ try:
     PORT = int(sys.argv[2])
     REGISTER = sys.argv[3]
     DIRECCION = sys.argv[4]
-    TIME = sys.argv[5]  
+    TIME = sys.argv[5]
+
 except IndexError:
     sys.exit('Usage: client.py ip puerto register sip_address expires_value')
 
@@ -27,10 +28,10 @@ my_socket.connect((SERVER, PORT))
 
 if sys.argv[3] == 'register':
     TIEMPO = ("Expires:" + ' ' + TIME + ' ' + '\r\n\r\n')
-    REGISTER  = ('REGISTER' + ' ' + 'sip:' + sys.argv[4] + ' ' + 'SIP/2.0')
-    my_socket.send(bytes(REGISTER , 'utf-8') + b'\r\n\r\n' + bytes(TIEMPO, 'utf-8'))
+    REGISTER = ('REGISTER' + ' ' + 'sip:' + sys.argv[4] + ' ' + 'SIP/2.0')
+    my_socket.send(bytes(REGISTER, 'utf-8') + b'\r\n\r\n' + bytes(TIEMPO, 'utf-8'))
     data = my_socket.recv(1024)
-    
+
 
 print('Recibido -- ', data.decode('utf-8'))
 print("Terminando socket...")
