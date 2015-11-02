@@ -7,6 +7,7 @@ Clase (y programa principal) para un servidor de eco en UDP simple
 import socketserver
 import sys
 import json
+import time
 
 
 class SIPRegisterHandler(socketserver.DatagramRequestHandler):
@@ -19,6 +20,9 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     def register2json(self):
        # datosJson = json.dumps(self.misDatos)
         with open('registered.json', 'w') as ff:
+         #   hora = time.gmtime(self.dicc[direccion][1]) #toma los segundos desde el 1 de enero de 1970 (devuelve tupla)
+         #  hora = time.strftime('%Y-%m-%d %H:%M:%S', hora) + '\r\n' #representa el tiempo en un string
+         #   datos = (direccion + '\r\n' + self.dicc[direccion][0] + hora)
             json.dump(self.dicc, ff)
 
     def handle(self):
@@ -43,7 +47,8 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                    break
                 else:
                     direccion = elemento[1].split(':')[1]
-                    time_expires = elemento[-2]
+                    time_expires = time.gmtime(int(elemento[-2]))
+                    time_expires = time.strftime('%Y-%m-%d %H:%M:%S', time_expires)
                     self.dicc[direccion] = [IP, time_expires]
                     print('IP traza:' + IP)
                     print('Expires traza:' + time_expires)
