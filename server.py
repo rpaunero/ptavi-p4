@@ -75,8 +75,8 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
 
                 temp_list = []
                 for usuario in self.dicc:
-
-                    if (time.strptime(self.dicc[usuario][1], formato) <= current_time1):
+                    usuario_time = self.dicc[usuario][1]
+                    if (time.strptime(usuario_time, formato) <= current_time1):
                         temp_list.append(usuario)
                         print('Añado a : ' + usuario + 'lista temporal')
                 for usuario in temp_list:
